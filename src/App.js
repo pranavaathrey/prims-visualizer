@@ -36,6 +36,14 @@ export default function PrimsVisualizer() {
 
   const NODE_RADIUS = 20;
 
+  useEffect(() => {
+    document.title = "Prim's MST Visualizer";
+    const favicon = document.createElement('link');
+    favicon.rel = 'icon';
+    favicon.href = 'favicon.ico';
+    document.head.appendChild(favicon);
+  }, []);
+
   const distance = (p1, p2) => {
     return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
   };
@@ -1037,9 +1045,9 @@ export default function PrimsVisualizer() {
           />
 
           {tableData.length > 0 && (
-            <div className="flex-1 overflow-auto animate-fadeIn">
+            <div className="flex-1 overflow-auto animate-fadeIn rounded-xl">
               <h3 className="text-lg font-bold mb-2" style={{ color: '#e0def4' }}>Algorithm State</h3>
-              <table className="w-full border-collapse text-sm">
+              <table className="w-full border-collapse text-sm rounded-xl">
                 <thead>
                   <tr style={{ backgroundColor: '#393552' }}>
                     <th className="px-3 py-2" style={{ border: '2px solid #44415a', color: '#e0def4' }}>Node</th>
@@ -1098,6 +1106,10 @@ export default function PrimsVisualizer() {
           </div>
         </div>
       </div>
+
+      <footer className="mt-6 text-sm font-semibold text-center" style={{ color: '#908caa' }}>
+        Created for a CN Project. Participants: 24BCE5375, 24BCE5406
+      </footer>
       
       <style>{`
         @keyframes fadeIn {
