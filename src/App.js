@@ -794,7 +794,7 @@ export default function PrimsVisualizer() {
   if (isMobile) {
     return (
       <div className="flex items-center justify-center min-h-screen p-6" style={{ 
-        backgroundImage: 'url(/images/background.png)',
+        backgroundImage: 'url(/images/background.webp)',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
@@ -822,7 +822,7 @@ export default function PrimsVisualizer() {
       className="flex flex-col items-center gap-4 p-6 min-h-screen" 
       style={{ 
         backgroundColor: '#2a273f',
-        backgroundImage: 'url(/images/background.png)', 
+        backgroundImage: 'url(/images/background.webp)', 
         backgroundSize: 'cover', 
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed'
