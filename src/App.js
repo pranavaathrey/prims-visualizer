@@ -939,7 +939,7 @@ export default function PrimsVisualizer() {
                       boxShadow: isPaused ? 'none' : '0 4px 15px rgba(234, 154, 151, 0.4)'
                     }}
                   >
-                    {isSpeedingUp ? '⚡ Speeding...' : 'Hold to Speed'}
+                    {isSpeedingUp ? '⚡ Speeding...' : 'Hold to Speed up'}
                   </button>
                 </div>
               </>
@@ -1079,7 +1079,7 @@ export default function PrimsVisualizer() {
           {showInstructions && (
             <div className="mb-4 p-3 rounded-lg border-2 animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#9ccfd8' }}>
               <p className="text-sm" style={{ color: '#e0def4' }}>
-                <strong>Instructions:</strong> Click to add nodes. Drag between nodes to create edges. Drag into empty space to create a new node with an edge. Double-click a node to rename it. Double-click an edge weight to edit it. Right-click to delete. Hold Previous/Next buttons for 250ms to navigate quickly through steps.
+                <strong>Instructions:</strong> Click to add nodes. Drag between nodes to create edges. Drag into empty space to create a new node with an edge. Double-click a node to rename it. Double-click an edge weight to edit it. Right-click to delete. Hold Previous/Next buttons to navigate quickly through steps.
               </p>
             </div>
           )}
@@ -1187,6 +1187,68 @@ export default function PrimsVisualizer() {
           }
           .animate-fadeIn {
             animation: fadeIn 0.3s ease-out;
+          }
+          
+          /* --- Custom Styles for Checkbox --- */
+          input[type='checkbox'] {
+            position: relative;
+            cursor: pointer;
+            /* Hides the default browser checkbox */
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+          }
+
+          input[type='checkbox']:before {
+            content: "";
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            top: 0;
+            left: 0;
+            /* Dark Desaturated Purple Border */
+            border: 2px solid #44415a; 
+            border-radius: 5px;
+            padding: 1px;
+            /* Darker Background for Unchecked State */
+            background-color: #28243b; 
+          }
+
+          input[type='checkbox']:checked:before {
+            /* Primary Accent Color for Checked State */
+            background-color: #9575cd; 
+            border-color: #9575cd; 
+          }
+
+          input[type='checkbox']:checked:after {
+            content: "";
+            display: block;
+            width: 5px;
+            height: 10px;
+            /* Light/Subtle Text Color for the Checkmark */
+            border: solid #e0def4; 
+            border-width: 0 2px 2px 0;
+            -webkit-transform: rotate(45deg);
+            -ms-transform: rotate(45deg);
+            transform: rotate(45deg);
+            position: absolute;
+            top: 2px;
+            left: 6px;
+          }
+          
+          /* --- Custom Styles for Number Input Spin Buttons --- */
+          input[type='number']::-webkit-inner-spin-button, 
+          input[type='number']::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+            opacity: 1;
+            color: #908caa; /* Sets the color of the arrows themselves */
+            background-color: #393552; /* Darker background for the button area */
+            border-left: 2px solid #44415a;
+          }
+          
+          input[type='number'] {
+            -moz-appearance: textfield;
           }
         `}</style>
       </div>
