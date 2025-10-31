@@ -27,6 +27,7 @@ export default function PrimsVisualizer() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [isHoldingNext, setIsHoldingNext] = useState(false);
   const [isHoldingPrev, setIsHoldingPrev] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const canvasRef = useRef(null);
   const shouldPauseRef = useRef(false);
   const algorithmRunningRef = useRef(false);
@@ -35,21 +36,29 @@ export default function PrimsVisualizer() {
   const holdTimeoutRef = useRef(null);
 
   const NODE_RADIUS = 20;
+  const SCALE_FACTOR = 0.05; // Convert pixels to smaller units
 
   useEffect(() => {
-    document.title = "Prim's MST Visualizer";
-    const favicon = document.createElement('link');
-    favicon.rel = 'icon';
-    favicon.href = 'favicon.ico';
-    document.head.appendChild(favicon);
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   const distance = (p1, p2) => {
-    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
+    const dx = p2.x - p1.x;
+    const dy = p2.y - p1.y;
+    return Math.sqrt(dx * dx + dy * dy) * SCALE_FACTOR;
   };
 
   const findNodeAt = (x, y) => {
-    return nodes.find(node => distance(node, { x, y }) <= NODE_RADIUS);
+    return nodes.find(node => {
+      const dx = node.x - x;
+      const dy = node.y - y;
+      return Math.sqrt(dx * dx + dy * dy) <= NODE_RADIUS;
+    });
   };
 
   const findEdgeAt = (x, y) => {
@@ -61,8 +70,10 @@ export default function PrimsVisualizer() {
       
       const midX = (fromNode.x + toNode.x) / 2;
       const midY = (fromNode.y + toNode.y) / 2;
+      const dx = x - midX;
+      const dy = y - midY;
       
-      if (distance({ x, y }, { x: midX, y: midY }) <= 20) {
+      if (Math.sqrt(dx * dx + dy * dy) <= 20) {
         return edge;
       }
     }
@@ -152,7 +163,9 @@ export default function PrimsVisualizer() {
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    if (distance(dragStart, { x, y }) > 5) {
+    const dx = x - dragStart.x;
+    const dy = y - dragStart.y;
+    if (Math.sqrt(dx * dx + dy * dy) > 5) {
       setIsDragging(true);
       setDragEnd({ x, y });
     }
@@ -176,7 +189,7 @@ export default function PrimsVisualizer() {
         );
 
         if (!edgeExists) {
-          const weight = Math.round(distance(dragStart, endNode));
+          const weight = Math.round(distance(dragStart, endNode) * 10) / 10; // One decimal place
           setEdges([...edges, { from: dragStart.id, to: endNode.id, weight }]);
         }
       } else if (!endNode) {
@@ -186,7 +199,7 @@ export default function PrimsVisualizer() {
           y,
           name: nodes.length.toString()
         };
-        const weight = Math.round(distance(dragStart, { x, y }));
+        const weight = Math.round(distance(dragStart, { x, y }) * 10) / 10; // One decimal place
         
         setNodes([...nodes, newNode]);
         setEdges([...edges, { from: dragStart.id, to: newNode.id, weight }]);
@@ -692,9 +705,12 @@ export default function PrimsVisualizer() {
       const isEditingThis = editingEdge && editingEdge.from === edge.from && editingEdge.to === edge.to;
       
       ctx.fillStyle = isEditingThis ? '#f6c177' : '#232136';
-      ctx.fillRect(midX - 15, midY - 10, 30, 20);
+      ctx.beginPath();
+      ctx.roundRect(midX - 18, midY - 12, 36, 24, 6);
+      ctx.fill();
       ctx.strokeStyle = isEditingThis ? '#ea9a97' : '#44415a';
-      ctx.strokeRect(midX - 15, midY - 10, 30, 20);
+      ctx.lineWidth = 2;
+      ctx.stroke();
       
       ctx.fillStyle = isEditingThis ? '#232136' : '#e0def4';
       ctx.font = '14px Arial';
@@ -739,17 +755,19 @@ export default function PrimsVisualizer() {
         ? `Step ${currentStateIndex + 1} / ${algorithmStates.length}`
         : `Step ${currentStateIndex + 1}`;
       
+      ctx.font = 'bold 16px Arial';
       const textWidth = ctx.measureText(counterText).width;
       const boxWidth = textWidth + 20;
       
       ctx.fillStyle = 'rgba(35, 33, 54, 0.95)';
-      ctx.fillRect(canvas.width - boxWidth - 10, 10, boxWidth, 35);
+      ctx.beginPath();
+      ctx.roundRect(canvas.width - boxWidth - 10, 10, boxWidth, 35, 8);
+      ctx.fill();
       ctx.strokeStyle = '#44415a';
       ctx.lineWidth = 2;
-      ctx.strokeRect(canvas.width - boxWidth - 10, 10, boxWidth, 35);
+      ctx.stroke();
       
       ctx.fillStyle = '#e0def4';
-      ctx.font = 'bold 16px Arial';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(counterText, canvas.width - boxWidth / 2 - 10, 27);
@@ -758,10 +776,12 @@ export default function PrimsVisualizer() {
     // Draw "Execution is paused" text when paused
     if (isPaused) {
       ctx.fillStyle = 'rgba(246, 193, 119, 0.95)';
-      ctx.fillRect(10, 10, 180, 35);
+      ctx.beginPath();
+      ctx.roundRect(10, 10, 180, 35, 8);
+      ctx.fill();
       ctx.strokeStyle = '#ea9a97';
       ctx.lineWidth = 2;
-      ctx.strokeRect(10, 10, 180, 35);
+      ctx.stroke();
       
       ctx.fillStyle = '#232136';
       ctx.font = 'bold 16px Arial';
@@ -771,13 +791,56 @@ export default function PrimsVisualizer() {
     }
   }, [nodes, edges, dragStart, dragEnd, isDragging, mstEdges, visitedNodes, currentEdge, isDirected, editingNode, editingEdge, currentStateIndex, algorithmStates, executionCompleted, isPaused]);
 
+  if (isMobile) {
+    return (
+      <div className="flex items-center justify-center min-h-screen p-6" style={{ 
+        backgroundImage: 'url(/images/background.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}>
+        <div className="p-8 rounded-2xl shadow-2xl max-w-md text-center" style={{ 
+          backgroundColor: 'rgba(42, 39, 63, 0.95)',
+          border: '2px solid #44415a',
+          backdropFilter: 'blur(10px)'
+        }}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#9ccfd8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4">
+            <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+            <line x1="12" y1="18" x2="12.01" y2="18"></line>
+          </svg>
+          <h2 className="text-2xl font-bold mb-4" style={{ color: '#e0def4' }}>Desktop Required</h2>
+          <p style={{ color: '#908caa' }}>
+            This visualizer is optimized for desktop viewing. Please access this page on a desktop or laptop computer for the best experience.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col items-center gap-4 p-6 min-h-screen" style={{ background: 'linear-gradient(135deg, #232136 0%, #2a273f 100%)' }}>
-      <h1 className="text-4xl font-bold" style={{ color: '#e0def4', textShadow: '0 2px 10px rgba(156, 207, 216, 0.3)' }}>
+    <div 
+      className="flex flex-col items-center gap-4 p-6 min-h-screen" 
+      style={{ 
+        backgroundColor: '#2a273f',
+        backgroundImage: 'url(/images/background.png)', 
+        backgroundSize: 'cover', 
+        backgroundPosition: 'center',
+        backgroundAttachment: 'fixed'
+      }}
+    >
+      <h1 className="text-4xl font-bold" style={{ color: '#e0def4', textShadow: '0 2px 10px rgba(156, 207, 216, 0.3)', marginBottom: '1em' }}>
         Prim's Algorithm Visualizer
       </h1>
       
-      <div className="p-6 rounded-xl shadow-2xl w-full max-w-7xl transition-all duration-300" style={{ backgroundColor: '#2a273f', border: '2px solid #44415a' }}>
+      <div 
+        className="p-6 rounded-xl shadow-2xl w-full max-w-7xl transition-all duration-300" 
+        style={{ 
+          backgroundColor: 'rgba(42, 39, 63, 0.8)', 
+          border: '2px solid #44415a',
+          backdropFilter: 'blur(10px)', 
+          WebkitBackdropFilter: 'blur(10px)' 
+        }}
+      >
         <div className="flex gap-4 mb-4 flex-wrap items-center justify-between">
           <div className="flex gap-4 flex-wrap items-center">
           {!isRunning && !executionCompleted ? (
@@ -1012,7 +1075,7 @@ export default function PrimsVisualizer() {
         {showInstructions && (
           <div className="mb-4 p-3 rounded-lg border-2 animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#9ccfd8' }}>
             <p className="text-sm" style={{ color: '#e0def4' }}>
-              <strong>Instructions:</strong> Click to add nodes. Drag between nodes to create edges. Drag into empty space to create a new node with an edge. Double-click a node to rename it. Double-click an edge weight to edit it. Right-click to delete. Hold Previous/Next buttons to navigate quickly through steps.
+              <strong>Instructions:</strong> Click to add nodes. Drag between nodes to create edges. Drag into empty space to create a new node with an edge. Double-click a node to rename it. Double-click an edge weight to edit it. Right-click to delete. Hold Previous/Next buttons for 250ms to navigate quickly through steps.
             </p>
           </div>
         )}
@@ -1045,40 +1108,42 @@ export default function PrimsVisualizer() {
           />
 
           {tableData.length > 0 && (
-            <div className="flex-1 overflow-auto animate-fadeIn rounded-xl">
+            <div className="flex-1 overflow-auto animate-fadeIn">
               <h3 className="text-lg font-bold mb-2" style={{ color: '#e0def4' }}>Algorithm State</h3>
-              <table className="w-full border-collapse text-sm rounded-xl">
+              <div className="overflow-hidden rounded-lg" style={{ border: '2px solid #44415a' }}>
+              <table className="w-full border-collapse text-sm">
                 <thead>
                   <tr style={{ backgroundColor: '#393552' }}>
-                    <th className="px-3 py-2" style={{ border: '2px solid #44415a', color: '#e0def4' }}>Node</th>
-                    <th className="px-3 py-2" style={{ border: '2px solid #44415a', color: '#e0def4' }}>Visited</th>
-                    <th className="px-3 py-2" style={{ border: '2px solid #44415a', color: '#e0def4' }}>Distance</th>
-                    <th className="px-3 py-2" style={{ border: '2px solid #44415a', color: '#e0def4' }}>Previous</th>
+                    <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Node</th>
+                    <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Visited</th>
+                    <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Distance</th>
+                    <th className="px-3 py-2" style={{ borderBottom: '2px solid #44415a', color: '#e0def4' }}>Previous</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {tableData.map(row => (
+                  {tableData.map((row, idx) => (
                     <tr 
                       key={row.nodeId}
                       className="transition-all duration-300"
                       style={{ backgroundColor: changedNodes.has(row.nodeId) ? '#f6c177' : '#2a273f' }}
                     >
-                      <td className="px-3 py-2 text-center font-semibold" style={{ border: '2px solid #44415a', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                      <td className="px-3 py-2 text-center font-semibold" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
                         {row.nodeName}
                       </td>
-                      <td className="px-3 py-2 text-center" style={{ border: '2px solid #44415a', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                      <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
                         {row.visited ? '✓' : '✗'}
                       </td>
-                      <td className="px-3 py-2 text-center" style={{ border: '2px solid #44415a', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                      <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
                         {row.distance}
                       </td>
-                      <td className="px-3 py-2 text-center" style={{ border: '2px solid #44415a', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                      <td className="px-3 py-2 text-center" style={{ borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
                         {row.previous}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
+              </div>
             </div>
           )}
         </div>
@@ -1108,7 +1173,7 @@ export default function PrimsVisualizer() {
       </div>
 
       <footer className="mt-6 text-sm font-semibold text-center" style={{ color: '#908caa' }}>
-        Created for a CN Project. Participants: 24BCE5375, 24BCE5406
+        Created for a Computer Networks Project. Participants: 24BCE5375, 24BCE5406.
       </footer>
       
       <style>{`
