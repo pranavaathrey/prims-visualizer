@@ -447,7 +447,8 @@ export default function PrimsVisualizer() {
 
     if (algorithmRunningRef.current) {
       setChangedNodes(new Set());
-      const finalInfo = `Algorithm complete! MST has ${mst.length} edges with total weight: ${mst.reduce((sum, e) => sum + e.weight, 0)}`;
+      const totalWeight = mst.reduce((sum, e) => sum + e.weight, 0).toFixed(2);
+      const finalInfo = `Algorithm complete! MST has ${mst.length} edges with total weight: ${totalWeight}`;
       setStepInfo(finalInfo);
       
       states.push({
