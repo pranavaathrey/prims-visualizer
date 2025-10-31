@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Analytics } from "@vercel/analytics/react"
 
 export default function PrimsVisualizer() {
   const [nodes, setNodes] = useState([]);
@@ -819,373 +820,376 @@ export default function PrimsVisualizer() {
   }
 
   return (
-    <div 
-      className="flex flex-col items-center gap-4 p-6 min-h-screen" 
-      style={{ 
-        backgroundColor: '#2a273f',
-        backgroundImage: 'url(/images/background.webp)', 
-        backgroundSize: 'cover', 
-        backgroundPosition: 'center',
-        backgroundAttachment: 'fixed'
-      }}
-    >
-      <h1 className="text-4xl font-bold" style={{ color: '#e0def4', textShadow: '0 2px 10px rgba(156, 207, 216, 0.3)', marginBottom: '1em' }}>
-        Prim's Algorithm Visualizer
-      </h1>
-      
+    <div className='bruh'>
+      <Analytics />
       <div 
-        className="p-6 rounded-xl shadow-2xl w-full max-w-7xl transition-all duration-300" 
+        className="flex flex-col items-center gap-4 p-6 min-h-screen" 
         style={{ 
-          backgroundColor: 'rgba(42, 39, 63, 0.8)', 
-          border: '2px solid #44415a',
-          backdropFilter: 'blur(10px)', 
-          WebkitBackdropFilter: 'blur(10px)' 
+          backgroundColor: '#2a273f',
+          backgroundImage: 'url(/images/background.webp)', 
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center',
+          backgroundAttachment: 'fixed'
         }}
       >
-        <div className="flex gap-4 mb-4 flex-wrap items-center justify-between">
-          <div className="flex gap-4 flex-wrap items-center">
-          {!isRunning && !executionCompleted ? (
-            <button
-              onClick={runPrimsAlgorithm}
-              disabled={nodes.length === 0}
-              className="px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95"
-              style={{
-                backgroundColor: nodes.length === 0 ? '#44415a' : '#9ccfd8',
-                color: '#232136',
-                cursor: nodes.length === 0 ? 'not-allowed' : 'pointer',
-                boxShadow: nodes.length === 0 ? 'none' : '0 4px 15px rgba(156, 207, 216, 0.4)'
-              }}
-            >
-              Calculate!
-            </button>
-          ) : isRunning ? (
-            <>
+        <h1 className="text-4xl font-bold" style={{ color: '#e0def4', textShadow: '0 2px 10px rgba(156, 207, 216, 0.3)', marginBottom: '1em' }}>
+          Prim's Algorithm Visualizer
+        </h1>
+        
+        <div 
+          className="p-6 rounded-xl shadow-2xl w-full max-w-7xl transition-all duration-300" 
+          style={{ 
+            backgroundColor: 'rgba(42, 39, 63, 0.8)', 
+            border: '2px solid #44415a',
+            backdropFilter: 'blur(10px)', 
+            WebkitBackdropFilter: 'blur(10px)' 
+          }}
+        >
+          <div className="flex gap-4 mb-4 flex-wrap items-center justify-between">
+            <div className="flex gap-4 flex-wrap items-center">
+            {!isRunning && !executionCompleted ? (
               <button
-                onClick={togglePause}
+                onClick={runPrimsAlgorithm}
+                disabled={nodes.length === 0}
                 className="px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95"
-                style={{ backgroundColor: '#f6c177', color: '#232136', boxShadow: '0 4px 15px rgba(246, 193, 119, 0.4)' }}
+                style={{
+                  backgroundColor: nodes.length === 0 ? '#44415a' : '#9ccfd8',
+                  color: '#232136',
+                  cursor: nodes.length === 0 ? 'not-allowed' : 'pointer',
+                  boxShadow: nodes.length === 0 ? 'none' : '0 4px 15px rgba(156, 207, 216, 0.4)'
+                }}
               >
-                {isPaused ? 'Resume' : 'Pause'}
+                Calculate!
               </button>
-              {isPaused && (
-                <>
-                  <button
-                    onMouseDown={handlePrevMouseDown}
-                    onMouseUp={handlePrevMouseUp}
-                    onMouseLeave={handlePrevMouseUp}
-                    disabled={currentStateIndex <= 0}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                      currentStateIndex <= 0 ? '' : 'transform hover:scale-105 active:scale-95'
-                    }`}
-                    style={{
-                      backgroundColor: currentStateIndex <= 0 ? '#44415a' : isHoldingPrev ? '#9575cd' : '#c4a7e7',
-                      color: currentStateIndex <= 0 ? '#6e6a86' : '#232136',
-                      cursor: currentStateIndex <= 0 ? 'not-allowed' : 'pointer',
-                      boxShadow: currentStateIndex <= 0 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
-                    }}
-                  >
-                    ← Previous
-                  </button>
-                  <button
-                    onMouseDown={handleNextMouseDown}
-                    onMouseUp={handleNextMouseUp}
-                    onMouseLeave={handleNextMouseUp}
-                    disabled={currentStateIndex >= algorithmStates.length - 1}
-                    className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                      currentStateIndex >= algorithmStates.length - 1 ? '' : 'transform hover:scale-105 active:scale-95'
-                    }`}
-                    style={{
-                      backgroundColor: currentStateIndex >= algorithmStates.length - 1 ? '#44415a' : isHoldingNext ? '#9575cd' : '#c4a7e7',
-                      color: currentStateIndex >= algorithmStates.length - 1 ? '#6e6a86' : '#232136',
-                      cursor: currentStateIndex >= algorithmStates.length - 1 ? 'not-allowed' : 'pointer',
-                      boxShadow: currentStateIndex >= algorithmStates.length - 1 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
-                    }}
-                  >
-                    Next →
-                  </button>
-                </>
-              )}
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-semibold" style={{ color: '#e0def4' }}>Speed:</label>
-                <input
-                  type="number"
-                  value={speedMultiplier}
-                  onChange={(e) => setSpeedMultiplier(Math.max(1, parseInt(e.target.value) || 10))}
-                  disabled={isPaused}
-                  className="px-2 py-1 rounded w-16 text-center transition-all duration-200"
-                  style={{
-                    backgroundColor: isPaused ? '#393552' : '#232136',
-                    color: isPaused ? '#6e6a86' : '#e0def4',
-                    border: '2px solid #44415a'
-                  }}
-                  min="1"
-                />
-                <span className="text-sm" style={{ color: '#908caa' }}>x</span>
+            ) : isRunning ? (
+              <>
                 <button
-                  onMouseDown={handleSpeedUpMouseDown}
-                  onMouseUp={handleSpeedUpMouseUp}
-                  onMouseLeave={handleSpeedUpMouseUp}
-                  disabled={isPaused}
+                  onClick={togglePause}
+                  className="px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95"
+                  style={{ backgroundColor: '#f6c177', color: '#232136', boxShadow: '0 4px 15px rgba(246, 193, 119, 0.4)' }}
+                >
+                  {isPaused ? 'Resume' : 'Pause'}
+                </button>
+                {isPaused && (
+                  <>
+                    <button
+                      onMouseDown={handlePrevMouseDown}
+                      onMouseUp={handlePrevMouseUp}
+                      onMouseLeave={handlePrevMouseUp}
+                      disabled={currentStateIndex <= 0}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                        currentStateIndex <= 0 ? '' : 'transform hover:scale-105 active:scale-95'
+                      }`}
+                      style={{
+                        backgroundColor: currentStateIndex <= 0 ? '#44415a' : isHoldingPrev ? '#9575cd' : '#c4a7e7',
+                        color: currentStateIndex <= 0 ? '#6e6a86' : '#232136',
+                        cursor: currentStateIndex <= 0 ? 'not-allowed' : 'pointer',
+                        boxShadow: currentStateIndex <= 0 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
+                      }}
+                    >
+                      ← Previous
+                    </button>
+                    <button
+                      onMouseDown={handleNextMouseDown}
+                      onMouseUp={handleNextMouseUp}
+                      onMouseLeave={handleNextMouseUp}
+                      disabled={currentStateIndex >= algorithmStates.length - 1}
+                      className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                        currentStateIndex >= algorithmStates.length - 1 ? '' : 'transform hover:scale-105 active:scale-95'
+                      }`}
+                      style={{
+                        backgroundColor: currentStateIndex >= algorithmStates.length - 1 ? '#44415a' : isHoldingNext ? '#9575cd' : '#c4a7e7',
+                        color: currentStateIndex >= algorithmStates.length - 1 ? '#6e6a86' : '#232136',
+                        cursor: currentStateIndex >= algorithmStates.length - 1 ? 'not-allowed' : 'pointer',
+                        boxShadow: currentStateIndex >= algorithmStates.length - 1 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
+                      }}
+                    >
+                      Next →
+                    </button>
+                  </>
+                )}
+                <div className="flex items-center gap-2">
+                  <label className="text-sm font-semibold" style={{ color: '#e0def4' }}>Speed:</label>
+                  <input
+                    type="number"
+                    value={speedMultiplier}
+                    onChange={(e) => setSpeedMultiplier(Math.max(1, parseInt(e.target.value) || 10))}
+                    disabled={isPaused}
+                    className="px-2 py-1 rounded w-16 text-center transition-all duration-200"
+                    style={{
+                      backgroundColor: isPaused ? '#393552' : '#232136',
+                      color: isPaused ? '#6e6a86' : '#e0def4',
+                      border: '2px solid #44415a'
+                    }}
+                    min="1"
+                  />
+                  <span className="text-sm" style={{ color: '#908caa' }}>x</span>
+                  <button
+                    onMouseDown={handleSpeedUpMouseDown}
+                    onMouseUp={handleSpeedUpMouseUp}
+                    onMouseLeave={handleSpeedUpMouseUp}
+                    disabled={isPaused}
+                    className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                      isPaused ? '' : 'transform hover:scale-105 active:scale-95'
+                    }`}
+                    style={{
+                      backgroundColor: isPaused ? '#44415a' : isSpeedingUp ? '#d97757' : '#ea9a97',
+                      color: '#232136',
+                      cursor: isPaused ? 'not-allowed' : 'pointer',
+                      boxShadow: isPaused ? 'none' : '0 4px 15px rgba(234, 154, 151, 0.4)'
+                    }}
+                  >
+                    {isSpeedingUp ? '⚡ Speeding...' : 'Hold to Speed'}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <div className="flex gap-2">
+                <button
+                  onMouseDown={handlePrevMouseDown}
+                  onMouseUp={handlePrevMouseUp}
+                  onMouseLeave={handlePrevMouseUp}
+                  disabled={currentStateIndex <= 0}
                   className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                    isPaused ? '' : 'transform hover:scale-105 active:scale-95'
+                    currentStateIndex <= 0 ? '' : 'transform hover:scale-105 active:scale-95'
                   }`}
                   style={{
-                    backgroundColor: isPaused ? '#44415a' : isSpeedingUp ? '#d97757' : '#ea9a97',
-                    color: '#232136',
-                    cursor: isPaused ? 'not-allowed' : 'pointer',
-                    boxShadow: isPaused ? 'none' : '0 4px 15px rgba(234, 154, 151, 0.4)'
+                    backgroundColor: currentStateIndex <= 0 ? '#44415a' : isHoldingPrev ? '#9575cd' : '#c4a7e7',
+                    color: currentStateIndex <= 0 ? '#6e6a86' : '#232136',
+                    cursor: currentStateIndex <= 0 ? 'not-allowed' : 'pointer',
+                    boxShadow: currentStateIndex <= 0 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
                   }}
                 >
-                  {isSpeedingUp ? '⚡ Speeding...' : 'Hold to Speed'}
+                  ← Previous
+                </button>
+                <button
+                  onMouseDown={handleNextMouseDown}
+                  onMouseUp={handleNextMouseUp}
+                  onMouseLeave={handleNextMouseUp}
+                  disabled={currentStateIndex >= algorithmStates.length - 1}
+                  className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
+                    currentStateIndex >= algorithmStates.length - 1 ? '' : 'transform hover:scale-105 active:scale-95'
+                  }`}
+                  style={{
+                    backgroundColor: currentStateIndex >= algorithmStates.length - 1 ? '#44415a' : isHoldingNext ? '#9575cd' : '#c4a7e7',
+                    color: currentStateIndex >= algorithmStates.length - 1 ? '#6e6a86' : '#232136',
+                    cursor: currentStateIndex >= algorithmStates.length - 1 ? 'not-allowed' : 'pointer',
+                    boxShadow: currentStateIndex >= algorithmStates.length - 1 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
+                  }}
+                >
+                  Next →
                 </button>
               </div>
-            </>
-          ) : (
-            <div className="flex gap-2">
+            )}
+            <button
+              onClick={reset}
+              className="px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95"
+              style={{ backgroundColor: '#eb6f92', color: '#232136', boxShadow: '0 4px 15px rgba(235, 111, 146, 0.4)' }}
+            >
+              Reset
+            </button>
+            
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isDirected}
+                onChange={handleDirectedChange}
+                disabled={isRunning}
+                className="w-4 h-4 cursor-pointer accent-iris"
+                style={{ accentColor: '#c4a7e7' }}
+              />
+              <span className="font-semibold" style={{ color: '#e0def4' }}>Directed Graph</span>
+            </label>
+            </div>
+            
+            <button
+              onClick={() => setShowInstructions(!showInstructions)}
+              className="p-2 rounded-lg transition-all duration-200 transform hover:scale-110 active:scale-95"
+              style={{ backgroundColor: '#393552', color: '#9ccfd8' }}
+              title="Instructions"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+            </button>
+          </div>
+
+          {editingNode && (
+            <div className="mb-4 p-3 rounded-lg border-2 flex gap-2 items-center animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#f6c177' }}>
+              <span className="font-semibold" style={{ color: '#e0def4' }}>Edit node name:</span>
+              <input
+                type="text"
+                value={nodeNameInput}
+                onChange={(e) => setNodeNameInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && saveNodeName()}
+                onFocus={(e) => e.target.select()}
+                className="px-2 py-1 rounded transition-all duration-200"
+                style={{ backgroundColor: '#232136', color: '#e0def4', border: '2px solid #44415a' }}
+                autoFocus
+              />
               <button
-                onMouseDown={handlePrevMouseDown}
-                onMouseUp={handlePrevMouseUp}
-                onMouseLeave={handlePrevMouseUp}
-                disabled={currentStateIndex <= 0}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                  currentStateIndex <= 0 ? '' : 'transform hover:scale-105 active:scale-95'
-                }`}
-                style={{
-                  backgroundColor: currentStateIndex <= 0 ? '#44415a' : isHoldingPrev ? '#9575cd' : '#c4a7e7',
-                  color: currentStateIndex <= 0 ? '#6e6a86' : '#232136',
-                  cursor: currentStateIndex <= 0 ? 'not-allowed' : 'pointer',
-                  boxShadow: currentStateIndex <= 0 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
-                }}
+                onClick={saveNodeName}
+                className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#9ccfd8', color: '#232136' }}
               >
-                ← Previous
+                Save
               </button>
               <button
-                onMouseDown={handleNextMouseDown}
-                onMouseUp={handleNextMouseUp}
-                onMouseLeave={handleNextMouseUp}
-                disabled={currentStateIndex >= algorithmStates.length - 1}
-                className={`px-4 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                  currentStateIndex >= algorithmStates.length - 1 ? '' : 'transform hover:scale-105 active:scale-95'
-                }`}
-                style={{
-                  backgroundColor: currentStateIndex >= algorithmStates.length - 1 ? '#44415a' : isHoldingNext ? '#9575cd' : '#c4a7e7',
-                  color: currentStateIndex >= algorithmStates.length - 1 ? '#6e6a86' : '#232136',
-                  cursor: currentStateIndex >= algorithmStates.length - 1 ? 'not-allowed' : 'pointer',
-                  boxShadow: currentStateIndex >= algorithmStates.length - 1 ? 'none' : '0 4px 15px rgba(196, 167, 231, 0.4)'
-                }}
+                onClick={() => setEditingNode(null)}
+                className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#6e6a86', color: '#e0def4' }}
               >
-                Next →
+                Cancel
               </button>
             </div>
           )}
-          <button
-            onClick={reset}
-            className="px-6 py-2 rounded-lg font-semibold transition-all duration-200 transform hover:scale-105 active:scale-95"
-            style={{ backgroundColor: '#eb6f92', color: '#232136', boxShadow: '0 4px 15px rgba(235, 111, 146, 0.4)' }}
-          >
-            Reset
-          </button>
-          
-          <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={isDirected}
-              onChange={handleDirectedChange}
-              disabled={isRunning}
-              className="w-4 h-4 cursor-pointer accent-iris"
-              style={{ accentColor: '#c4a7e7' }}
+
+          {editingEdge && (
+            <div className="mb-4 p-3 rounded-lg border-2 flex gap-2 items-center animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#f6c177' }}>
+              <span className="font-semibold" style={{ color: '#e0def4' }}>Edit edge weight:</span>
+              <input
+                type="number"
+                value={edgeWeightInput}
+                onChange={(e) => setEdgeWeightInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && saveEdgeWeight()}
+                onFocus={(e) => e.target.select()}
+                className="px-2 py-1 rounded w-20 transition-all duration-200"
+                style={{ backgroundColor: '#232136', color: '#e0def4', border: '2px solid #44415a' }}
+                autoFocus
+              />
+              <button
+                onClick={saveEdgeWeight}
+                className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#9ccfd8', color: '#232136' }}
+              >
+                Save
+              </button>
+              <button
+                onClick={() => setEditingEdge(null)}
+                className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
+                style={{ backgroundColor: '#6e6a86', color: '#e0def4' }}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+
+          {showInstructions && (
+            <div className="mb-4 p-3 rounded-lg border-2 animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#9ccfd8' }}>
+              <p className="text-sm" style={{ color: '#e0def4' }}>
+                <strong>Instructions:</strong> Click to add nodes. Drag between nodes to create edges. Drag into empty space to create a new node with an edge. Double-click a node to rename it. Double-click an edge weight to edit it. Right-click to delete. Hold Previous/Next buttons for 250ms to navigate quickly through steps.
+              </p>
+            </div>
+          )}
+
+          {stepInfo && (
+            <div className="mb-4 p-3 rounded-lg border-2 animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#9ccfd8' }}>
+              <p className="text-sm font-semibold" style={{ color: '#e0def4' }}>{stepInfo}</p>
+            </div>
+          )}
+
+          <div className="flex gap-4">
+            <canvas
+              ref={canvasRef}
+              width={600}
+              height={600}
+              onClick={handleCanvasClick}
+              onDoubleClick={handleCanvasDoubleClick}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onContextMenu={handleContextMenu}
+              className={`rounded-lg cursor-crosshair transition-all duration-300 ${
+                isPaused ? 'border-dashed' : ''
+              }`}
+              style={{
+                backgroundColor: '#232136',
+                border: isPaused ? '3px dashed #f6c177' : '2px solid #44415a',
+                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)'
+              }}
             />
-            <span className="font-semibold" style={{ color: '#e0def4' }}>Directed Graph</span>
-          </label>
-          </div>
-          
-          <button
-            onClick={() => setShowInstructions(!showInstructions)}
-            className="p-2 rounded-lg transition-all duration-200 transform hover:scale-110 active:scale-95"
-            style={{ backgroundColor: '#393552', color: '#9ccfd8' }}
-            title="Instructions"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="10"></circle>
-              <line x1="12" y1="16" x2="12" y2="12"></line>
-              <line x1="12" y1="8" x2="12.01" y2="8"></line>
-            </svg>
-          </button>
-        </div>
 
-        {editingNode && (
-          <div className="mb-4 p-3 rounded-lg border-2 flex gap-2 items-center animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#f6c177' }}>
-            <span className="font-semibold" style={{ color: '#e0def4' }}>Edit node name:</span>
-            <input
-              type="text"
-              value={nodeNameInput}
-              onChange={(e) => setNodeNameInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && saveNodeName()}
-              onFocus={(e) => e.target.select()}
-              className="px-2 py-1 rounded transition-all duration-200"
-              style={{ backgroundColor: '#232136', color: '#e0def4', border: '2px solid #44415a' }}
-              autoFocus
-            />
-            <button
-              onClick={saveNodeName}
-              className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
-              style={{ backgroundColor: '#9ccfd8', color: '#232136' }}
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setEditingNode(null)}
-              className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
-              style={{ backgroundColor: '#6e6a86', color: '#e0def4' }}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-
-        {editingEdge && (
-          <div className="mb-4 p-3 rounded-lg border-2 flex gap-2 items-center animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#f6c177' }}>
-            <span className="font-semibold" style={{ color: '#e0def4' }}>Edit edge weight:</span>
-            <input
-              type="number"
-              value={edgeWeightInput}
-              onChange={(e) => setEdgeWeightInput(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && saveEdgeWeight()}
-              onFocus={(e) => e.target.select()}
-              className="px-2 py-1 rounded w-20 transition-all duration-200"
-              style={{ backgroundColor: '#232136', color: '#e0def4', border: '2px solid #44415a' }}
-              autoFocus
-            />
-            <button
-              onClick={saveEdgeWeight}
-              className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
-              style={{ backgroundColor: '#9ccfd8', color: '#232136' }}
-            >
-              Save
-            </button>
-            <button
-              onClick={() => setEditingEdge(null)}
-              className="px-4 py-1 rounded transition-all duration-200 transform hover:scale-105 active:scale-95"
-              style={{ backgroundColor: '#6e6a86', color: '#e0def4' }}
-            >
-              Cancel
-            </button>
-          </div>
-        )}
-
-        {showInstructions && (
-          <div className="mb-4 p-3 rounded-lg border-2 animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#9ccfd8' }}>
-            <p className="text-sm" style={{ color: '#e0def4' }}>
-              <strong>Instructions:</strong> Click to add nodes. Drag between nodes to create edges. Drag into empty space to create a new node with an edge. Double-click a node to rename it. Double-click an edge weight to edit it. Right-click to delete. Hold Previous/Next buttons for 250ms to navigate quickly through steps.
-            </p>
-          </div>
-        )}
-
-        {stepInfo && (
-          <div className="mb-4 p-3 rounded-lg border-2 animate-fadeIn" style={{ backgroundColor: '#393552', borderColor: '#9ccfd8' }}>
-            <p className="text-sm font-semibold" style={{ color: '#e0def4' }}>{stepInfo}</p>
-          </div>
-        )}
-
-        <div className="flex gap-4">
-          <canvas
-            ref={canvasRef}
-            width={600}
-            height={600}
-            onClick={handleCanvasClick}
-            onDoubleClick={handleCanvasDoubleClick}
-            onMouseDown={handleMouseDown}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onContextMenu={handleContextMenu}
-            className={`rounded-lg cursor-crosshair transition-all duration-300 ${
-              isPaused ? 'border-dashed' : ''
-            }`}
-            style={{
-              backgroundColor: '#232136',
-              border: isPaused ? '3px dashed #f6c177' : '2px solid #44415a',
-              boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)'
-            }}
-          />
-
-          {tableData.length > 0 && (
-            <div className="flex-1 overflow-auto animate-fadeIn">
-              <h3 className="text-lg font-bold mb-2" style={{ color: '#e0def4' }}>Algorithm State</h3>
-              <div className="overflow-hidden rounded-lg" style={{ border: '2px solid #44415a' }}>
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr style={{ backgroundColor: '#393552' }}>
-                    <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Node</th>
-                    <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Visited</th>
-                    <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Distance</th>
-                    <th className="px-3 py-2" style={{ borderBottom: '2px solid #44415a', color: '#e0def4' }}>Previous</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tableData.map((row, idx) => (
-                    <tr 
-                      key={row.nodeId}
-                      className="transition-all duration-300"
-                      style={{ backgroundColor: changedNodes.has(row.nodeId) ? '#f6c177' : '#2a273f' }}
-                    >
-                      <td className="px-3 py-2 text-center font-semibold" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                        {row.nodeName}
-                      </td>
-                      <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                        {row.visited ? '✓' : '✗'}
-                      </td>
-                      <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                        {row.distance}
-                      </td>
-                      <td className="px-3 py-2 text-center" style={{ borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                        {row.previous}
-                      </td>
+            {tableData.length > 0 && (
+              <div className="flex-1 overflow-auto animate-fadeIn">
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#e0def4' }}>Algorithm State</h3>
+                <div className="overflow-hidden rounded-lg" style={{ border: '2px solid #44415a' }}>
+                <table className="w-full border-collapse text-sm">
+                  <thead>
+                    <tr style={{ backgroundColor: '#393552' }}>
+                      <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Node</th>
+                      <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Visited</th>
+                      <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Distance</th>
+                      <th className="px-3 py-2" style={{ borderBottom: '2px solid #44415a', color: '#e0def4' }}>Previous</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {tableData.map((row, idx) => (
+                      <tr 
+                        key={row.nodeId}
+                        className="transition-all duration-300"
+                        style={{ backgroundColor: changedNodes.has(row.nodeId) ? '#f6c177' : '#2a273f' }}
+                      >
+                        <td className="px-3 py-2 text-center font-semibold" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                          {row.nodeName}
+                        </td>
+                        <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                          {row.visited ? '✓' : '✗'}
+                        </td>
+                        <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                          {row.distance}
+                        </td>
+                        <td className="px-3 py-2 text-center" style={{ borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                          {row.previous}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                </div>
               </div>
+            )}
+          </div>
+
+          <div className="mt-4 flex gap-6 text-sm flex-wrap">
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#c4a7e7' }}></div>
+              <span style={{ color: '#e0def4' }}>Unvisited Node</span>
             </div>
-          )}
+            <div className="flex items-center gap-2">
+              <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#9ccfd8' }}></div>
+              <span style={{ color: '#e0def4' }}>Visited Node</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1" style={{ backgroundColor: '#6e6a86' }}></div>
+              <span style={{ color: '#e0def4' }}>Edge</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1" style={{ backgroundColor: '#9ccfd8' }}></div>
+              <span style={{ color: '#e0def4' }}>MST Edge</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-1" style={{ backgroundColor: '#f6c177' }}></div>
+              <span style={{ color: '#e0def4' }}>Considering</span>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-4 flex gap-6 text-sm flex-wrap">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#c4a7e7' }}></div>
-            <span style={{ color: '#e0def4' }}>Unvisited Node</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-4 rounded-full" style={{ backgroundColor: '#9ccfd8' }}></div>
-            <span style={{ color: '#e0def4' }}>Visited Node</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-1" style={{ backgroundColor: '#6e6a86' }}></div>
-            <span style={{ color: '#e0def4' }}>Edge</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-1" style={{ backgroundColor: '#9ccfd8' }}></div>
-            <span style={{ color: '#e0def4' }}>MST Edge</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-1" style={{ backgroundColor: '#f6c177' }}></div>
-            <span style={{ color: '#e0def4' }}>Considering</span>
-          </div>
-        </div>
+        <footer className="mt-6 text-sm font-semibold text-center" style={{ color: '#908caa' }}>
+          Created for a Computer Networks Project. Participants: 24BCE5375, 24BCE5406.
+        </footer>
+        
+        <style>{`
+          @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+          .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+          }
+        `}</style>
       </div>
-
-      <footer className="mt-6 text-sm font-semibold text-center" style={{ color: '#908caa' }}>
-        Created for a Computer Networks Project. Participants: 24BCE5375, 24BCE5406.
-      </footer>
-      
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
     </div>
   );
 }
