@@ -1,3 +1,1 @@
-Fix: Having >25 nodes causes the state table to get longer than the canvas, which stretches out the canvas.
-Fix: If you delete a node that is connected to several other nodes, the nodes it was connected to have weird linking behaviour after the fact.
 Fix: The canvas appears low-res on mobile. Also there is no way to click and drag in mobile. (Although unsupported)

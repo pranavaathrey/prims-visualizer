@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Analytics } from "@vercel/analytics/react"
 
 export default function PrimsVisualizer() {
   const [nodes, setNodes] = useState([]);
@@ -848,7 +847,6 @@ export default function PrimsVisualizer() {
 
   return (
     <div className='bruh'>
-      <Analytics />
       <div 
         className="flex flex-col items-center gap-4 p-6 min-h-screen" 
         style={{ 
