@@ -1121,7 +1121,7 @@ export default function PrimsVisualizer() {
               style={{
                 alignSelf: 'flex-start',
                 position: 'sticky',
-                top: '1.5rem', // how far from top you want it to stay
+                top: '1.5rem',
                 zIndex: 10
               }}
             >
@@ -1146,45 +1146,71 @@ export default function PrimsVisualizer() {
               />
             </div>
 
-            {tableData.length > 0 && (
-              <div className="flex-1 overflow-auto animate-fadeIn">
-                <h3 className="text-lg font-bold mb-2" style={{ color: '#e0def4' }}>Algorithm State</h3>
-                <div className="overflow-hidden rounded-lg" style={{ border: '2px solid #44415a' }}>
-                <table className="w-full border-collapse text-sm">
-                  <thead>
-                    <tr style={{ backgroundColor: '#393552' }}>
-                      <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Node</th>
-                      <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Visited</th>
-                      <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Distance</th>
-                      <th className="px-3 py-2" style={{ borderBottom: '2px solid #44415a', color: '#e0def4' }}>Previous</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {tableData.map((row, idx) => (
-                      <tr 
-                        key={row.nodeId}
-                        className="transition-all duration-300"
-                        style={{ backgroundColor: changedNodes.has(row.nodeId) ? '#f6c177' : '#2a273f' }}
-                      >
-                        <td className="px-3 py-2 text-center font-semibold" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                          {row.nodeName}
-                        </td>
-                        <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                          {row.visited ? '✓' : '✗'}
-                        </td>
-                        <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                          {row.distance}
-                        </td>
-                        <td className="px-3 py-2 text-center" style={{ borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
-                          {row.previous}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-                </div>
+            <div className="flex-1 overflow-auto animate-fadeIn">
+              {/* --- Algorithm State Table --- */}
+              {tableData.length > 0 && (
+                <>
+                  <h3 className="text-lg font-bold mb-2" style={{ color: '#e0def4' }}>
+                    Algorithm State
+                  </h3>
+                  <div className="overflow-hidden rounded-lg mb-6" style={{ border: '2px solid #44415a' }}>
+                    <table className="w-full border-collapse text-sm">
+                      <thead>
+                        <tr style={{ backgroundColor: '#393552' }}>
+                          <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Node</th>
+                          <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Visited</th>
+                          <th className="px-3 py-2" style={{ borderRight: '2px solid #44415a', borderBottom: '2px solid #44415a', color: '#e0def4' }}>Distance</th>
+                          <th className="px-3 py-2" style={{ borderBottom: '2px solid #44415a', color: '#e0def4' }}>Previous</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {tableData.map((row, idx) => (
+                          <tr 
+                            key={row.nodeId}
+                            className="transition-all duration-300"
+                            style={{ backgroundColor: changedNodes.has(row.nodeId) ? '#f6c177' : '#2a273f' }}
+                          >
+                            <td className="px-3 py-2 text-center font-semibold" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                              {row.nodeName}
+                            </td>
+                            <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                              {row.visited ? '✓' : '✗'}
+                            </td>
+                            <td className="px-3 py-2 text-center" style={{ borderRight: '2px solid #44415a', borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                              {row.distance}
+                            </td>
+                            <td className="px-3 py-2 text-center" style={{ borderBottom: idx < tableData.length - 1 ? '2px solid #44415a' : 'none', color: changedNodes.has(row.nodeId) ? '#232136' : '#e0def4' }}>
+                              {row.previous}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+
+              {/* --- Prim’s Algorithm Info Section --- */}
+              <div className="p-4 rounded-lg border-2" style={{ backgroundColor: '#393552', borderColor: '#9ccfd8' }}>
+                <h3 className="text-lg font-bold mb-2" style={{ color: '#e0def4' }}>About Prim’s Algorithm</h3>
+                <p className="text-sm leading-relaxed" style={{ color: '#e0def4' }}>
+                  Prim’s Algorithm is a greedy algorithm used to find the Minimum Spanning Tree (MST)
+                  of a connected, weighted, undirected graph. It starts from an arbitrary node and
+                  grows the MST one edge at a time by always choosing the minimum-weight edge that
+                  connects a visited node to an unvisited node.
+                </p>
+                <ul className="mt-3 text-sm list-disc ml-5" style={{ color: '#e0def4' }}>
+                  <li>Time Complexity: O(E log V) using a priority queue</li>
+                  <li>Produces a tree with the minimum total edge weight</li>
+                  <li>Works only on connected graphs</li>
+                </ul>
+                <br></br>
+                <p className="text-sm leading-relaxed" style={{ color: '#e0def4' }}>
+                  To visualize this algorithm, start by clicking anywhere on the canvas on the left 
+                  to create nodes! Click on the info icon for more instructions.
+                </p>
               </div>
-            )}
+            </div>
           </div>
 
           <div className="mt-4 flex gap-6 text-sm flex-wrap">
