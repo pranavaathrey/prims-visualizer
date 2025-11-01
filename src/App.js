@@ -133,8 +133,34 @@ export default function PrimsVisualizer() {
     const clickedEdge = findEdgeAt(x, y);
 
     if (clickedNode) {
-      setNodes(nodes.filter(node => node.id !== clickedNode.id));
-      setEdges(edges.filter(edge => edge.from !== clickedNode.id && edge.to !== clickedNode.id));
+      const deletedId = clickedNode.id;
+      
+      // Remove the node and its edges
+      const remainingNodes = nodes.filter(node => node.id !== deletedId);
+      const remainingEdges = edges.filter(edge => 
+        edge.from !== deletedId && edge.to !== deletedId
+      );
+      
+      // Reassign IDs to maintain sequential order
+      const updatedNodes = remainingNodes.map((node, index) => ({
+        ...node,
+        id: index
+      }));
+      
+      // Update edge references to new IDs
+      const idMap = {};
+      remainingNodes.forEach((node, index) => {
+        idMap[node.id] = index;
+      });
+      
+      const updatedEdges = remainingEdges.map(edge => ({
+        ...edge,
+        from: idMap[edge.from],
+        to: idMap[edge.to]
+      }));
+      
+      setNodes(updatedNodes);
+      setEdges(updatedEdges);
     } else if (clickedEdge) {
       setEdges(edges.filter(edge => 
         !(edge.from === clickedEdge.from && edge.to === clickedEdge.to)
@@ -705,15 +731,16 @@ export default function PrimsVisualizer() {
       const midX = (fromNode.x + toNode.x) / 2;
       const midY = (fromNode.y + toNode.y) / 2;
       const isEditingThis = editingEdge && editingEdge.from === edge.from && editingEdge.to === edge.to;
-      
-      ctx.fillStyle = isEditingThis ? '#f6c177' : '#232136';
+
+      ctx.fillStyle = isEditingThis ? 'rgba(246, 193, 119, 0.7)' : 'rgba(35, 33, 54, 0.6)';
       ctx.beginPath();
       ctx.roundRect(midX - 18, midY - 12, 36, 24, 6);
       ctx.fill();
-      ctx.strokeStyle = isEditingThis ? '#ea9a97' : '#44415a';
+
+      ctx.strokeStyle = isEditingThis ? 'rgba(234, 154, 151, 0.8)' : 'rgba(68, 65, 90, 0.7)';
       ctx.lineWidth = 2;
       ctx.stroke();
-      
+
       ctx.fillStyle = isEditingThis ? '#232136' : '#e0def4';
       ctx.font = '14px Arial';
       ctx.textAlign = 'center';
@@ -1090,26 +1117,36 @@ export default function PrimsVisualizer() {
             </div>
           )}
 
-          <div className="flex gap-4">
-            <canvas
-              ref={canvasRef}
-              width={600}
-              height={600}
-              onClick={handleCanvasClick}
-              onDoubleClick={handleCanvasDoubleClick}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onContextMenu={handleContextMenu}
-              className={`rounded-lg cursor-crosshair transition-all duration-300 ${
-                isPaused ? 'border-dashed' : ''
-              }`}
+          <div className="flex gap-4 items-start">
+            <div 
+              className="sticky top-6 self-start" 
               style={{
-                backgroundColor: '#232136',
-                border: isPaused ? '3px dashed #f6c177' : '2px solid #44415a',
-                boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)'
+                alignSelf: 'flex-start',
+                position: 'sticky',
+                top: '1.5rem', // how far from top you want it to stay
+                zIndex: 10
               }}
-            />
+            >
+              <canvas
+                ref={canvasRef}
+                width={600}
+                height={600}
+                onClick={handleCanvasClick}
+                onDoubleClick={handleCanvasDoubleClick}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onContextMenu={handleContextMenu}
+                className={`rounded-lg cursor-crosshair transition-all duration-300 ${
+                  isPaused ? 'border-dashed' : ''
+                }`}
+                style={{
+                  backgroundColor: '#232136',
+                  border: isPaused ? '3px dashed #f6c177' : '2px solid #44415a',
+                  boxShadow: '0 8px 30px rgba(0, 0, 0, 0.4)'
+                }}
+              />
+            </div>
 
             {tableData.length > 0 && (
               <div className="flex-1 overflow-auto animate-fadeIn">
